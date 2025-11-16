@@ -35,3 +35,13 @@ export function mostrarGastos() {
   totalSpan.textContent =
     "Total de gastos: " + calcularTotalGastos().toFixed(2) + " €"; //devulve la suma de todos los gastos en 2 decimales
 }
+
+document.getElementById("guardar").addEventListener("click", () => {
+  guardarGastos();
+  alert("Gastos guardados correctamente.");
+});
+//añade los botones para guardar y cargar
+document.getElementById("cargar").addEventListener("click", () => {
+  cargarGastos();
+  mostrarGastos();
+});
