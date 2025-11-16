@@ -3,7 +3,9 @@ let gastos = [];
 let idGasto = 0;
 
 function actualizarPresupuesto(valor) {
-  if (typeof valor !== "number" || valor < 0) return -1;
+  if (typeof valor !== "number" || valor < 0) {
+    return -1;
+  }
   presupuesto = valor;
   return presupuesto;
 }
@@ -13,100 +15,75 @@ function mostrarPresupuesto() {
 }
 
 function CrearGasto(descripcion, valor, fecha = new Date(), ...etiquetas) {
-  if (!(this instanceof CrearGasto)) {
-    return new CrearGasto(descripcion, valor, fecha, ...etiquetas);
+  if (typeof valor !== "number" || valor < 0) {
+    valor = 0;
   }
 
-  this.descripcion =
-    typeof descripcion === "string" ? descripcion : "Sin descripción";
-  this.valor = typeof valor === "number" && valor >= 0 ? valor : 0;
+  this.descripcion = descripcion;
+  this.valor = valor;
 
-  const fechaObj = new Date(fecha);
-  this.fecha =
-    fechaObj.toString() !== "Invalid Date"
-      ? fechaObj.getTime()
-      : new Date().getTime();
+  let fechaConvertida = new Date(fecha);
+  if (fechaConvertida.toString() === "Invalid Date") {
+    fechaConvertida = new Date();
+  }
+
+  this.fecha = fechaConvertida.getTime();
   this.timestamp = this.fecha;
 
-  this.etiquetas = [];
+  this.etiquetas = etiquetas.length > 0 ? etiquetas : [];
 
-  if (etiquetas.length > 0 && Array.isArray(etiquetas[0])) {
-    this.etiquetas = etiquetas[0].filter(
-      (et) => typeof et === "string" && et.trim() !== ""
-    );
-  } else {
-    this.etiquetas = etiquetas.filter(
-      (et) => typeof et === "string" && et.trim() !== ""
-    );
-  }
+  this.mostrarGasto = function () {
+    return `Gasto de ${this.descripcion} ${this.valor} €`;
+  };
 
-  this.etiquetas = [...new Set(this.etiquetas)];
-}
-
-CrearGasto.prototype.mostrarGasto = function () {
-  return `Gasto correspondiente a ${this.descripcion} con valor ${this.valor} €`;
-};
-
-CrearGasto.prototype.mostrarGastoCompleto = function () {
-  let texto = `Gasto correspondiente a ${this.descripcion} con valor ${this.valor} €.\n`;
-  texto += `Fecha: ${new Date(this.fecha).toLocaleString()}\n`;
-
-  if (this.etiquetas.length > 0) {
+  this.mostrarGastoCompleto = function () {
+    let texto = `Gasto correspondiente a ${this.descripcion} con valor ${this.valor} €.\n`;
+    texto += `Fecha: ${new Date(this.fecha).toLocaleString()}\n`;
     texto += `Etiquetas:\n`;
     this.etiquetas.forEach((et) => {
       texto += `- ${et}\n`;
     });
-  } else {
-    texto += `Etiquetas:\n`;
-  }
+    return texto;
+  };
 
-  return texto;
-};
-
-CrearGasto.prototype.actualizarFecha = function (nuevaFecha) {
-  const nueva = new Date(nuevaFecha);
-  if (nueva.toString() !== "Invalid Date") {
-    this.fecha = nueva.getTime();
-    this.timestamp = this.fecha;
-  }
-};
-
-CrearGasto.prototype.actualizarDescripcion = function (newDescripcion) {
-  if (typeof newDescripcion === "string") {
-    this.descripcion = newDescripcion;
-  }
-};
-
-CrearGasto.prototype.actualizarValor = function (newValor) {
-  if (typeof newValor === "number" && newValor >= 0) {
-    this.valor = newValor;
-  }
-};
-
-CrearGasto.prototype.anyadirEtiquetas = function (...nuevasEtiquetas) {
-  const etiquetasPlanas = nuevasEtiquetas.flat();
-  etiquetasPlanas.forEach((et) => {
-    if (
-      typeof et === "string" &&
-      et.trim() !== "" &&
-      !this.etiquetas.includes(et)
-    ) {
-      this.etiquetas.push(et);
+  this.actualizarFecha = function (nuevaFecha) {
+    const nueva = new Date(nuevaFecha);
+    if (nueva.toString() !== "Invalid Date") {
+      this.fecha = nueva.getTime();
+      this.timestamp = this.fecha;
     }
-  });
-  this.etiquetas = [...new Set(this.etiquetas)];
-};
+  };
 
-CrearGasto.prototype.borrarEtiquetas = function (...etiquetasABorrar) {
-  const etiquetasPlanas = etiquetasABorrar.flat();
-  this.etiquetas = this.etiquetas.filter((et) => !etiquetasPlanas.includes(et));
-};
+  this.actualizarDescripcion = function (newDescripcion) {
+    this.descripcion = newDescripcion;
+  };
+
+  this.actualizarValor = function (newValor) {
+    if (typeof newValor === "number" && newValor >= 0) {
+      this.valor = newValor;
+    }
+  };
+
+  this.anyadirEtiquetas = function (...nuevasEtiquetas) {
+    nuevasEtiquetas.forEach((et) => {
+      if (!this.etiquetas.includes(et)) {
+        this.etiquetas.push(et);
+      }
+    });
+  };
+
+  this.borrarEtiquetas = function (...etiquetasABorrar) {
+    this.etiquetas = this.etiquetas.filter(
+      (et) => !etiquetasABorrar.includes(et)
+    );
+  };
+}
 
 CrearGasto.prototype.obtenerPeriodoAgrupacion = function (periodo) {
-  const fechaObj = new Date(this.fecha);
-  const y = fechaObj.getFullYear();
-  const m = (fechaObj.getMonth() + 1).toString().padStart(2, "0");
-  const d = fechaObj.getDate().toString().padStart(2, "0");
+  const fecha = new Date(this.fecha);
+  const y = fecha.getFullYear();
+  const m = (fecha.getMonth() + 1).toString().padStart(2, "0");
+  const d = fecha.getDate().toString().padStart(2, "0");
 
   if (periodo === "dia") return `${y}-${m}-${d}`;
   if (periodo === "anyo") return `${y}`;
@@ -119,8 +96,9 @@ function listarGastos() {
 
 function anyadirGasto(gasto) {
   if (!(gasto instanceof CrearGasto)) return -1;
-  gasto.id = idGasto++;
+  gasto.id = idGasto;
   gastos.push(gasto);
+  idGasto++;
   return gasto.id;
 }
 
@@ -142,7 +120,6 @@ function calcularBalance() {
 function filtrarGastos(filtros = {}) {
   return gastos.filter((g) => {
     const fechaGasto = new Date(g.fecha);
-
     if (filtros.fechaDesde && fechaGasto < new Date(filtros.fechaDesde))
       return false;
     if (filtros.fechaHasta && fechaGasto > new Date(filtros.fechaHasta))
@@ -156,9 +133,10 @@ function filtrarGastos(filtros = {}) {
         .includes(filtros.descripcionContiene.toLowerCase())
     )
       return false;
-    if (filtros.etiquetasTiene?.length > 0) {
-      const tiene = filtros.etiquetasTiene.some((et) =>
-        g.etiquetas.map((e) => e.toLowerCase()).includes(et.toLowerCase())
+    if (filtros.etiquetasTiene && filtros.etiquetasTiene.length > 0) {
+      const etiquetasMin = g.etiquetas.map((e) => e.toLowerCase());
+      const tiene = filtros.etiquetasTiene.some((e) =>
+        etiquetasMin.includes(e.toLowerCase())
       );
       if (!tiene) return false;
     }
@@ -173,16 +151,40 @@ function agruparGastos(
   fechaHasta
 ) {
   const filtrados = filtrarGastos({
-    fechaDesde,
-    fechaHasta,
+    fechaDesde: fechaDesde,
+    fechaHasta: fechaHasta,
     etiquetasTiene: etiquetas.length > 0 ? etiquetas : undefined,
   });
 
   return filtrados.reduce((acc, g) => {
     const clave = g.obtenerPeriodoAgrupacion(periodo);
-    acc[clave] = (acc[clave] || 0) + g.valor;
+    if (!acc[clave]) acc[clave] = 0;
+    acc[clave] += g.valor;
     return acc;
   }, {});
+}
+
+export function guardarGastos() {
+  //guarda la lista de gastos en un localStorage y se convierte en un json
+  localStorage.setItem("misGastos", JSON.stringify(gastos)); //guarda el array en un string json
+}
+
+export function cargarGastos() {
+  //carga la lista desde el localStorage
+  const datos = localStorage.getItem("misGastos"); //recupera los datos guardados
+  if (!datos) return;
+
+  const lista = JSON.parse(datos); //se convierte el string en un array
+
+  gastos.length = 0; //vacia el array global manteniendo la misma referencia
+
+  lista.forEach((g) => {
+    //reconstruye el objeto gasto
+    const nuevo = new CrearGasto(g.descripcion, g.valor);
+    nuevo.id = g.id;
+    gastos.push(nuevo); //se añade el gasto reconstruido al array global
+  });
+  idGasto = gastos.length; //mantiene el contador de id actualizado para evitar que se dupliquen los gastos nuevos
 }
 
 export {

@@ -5,24 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gestor de Gastos</title>
   </head>
+
   <body>
     <h1>Gestor de Gastos</h1>
 
-    <div>
-      <div id="total-container">Total de gastos: 0€</div>
-    </div>
+    <div id="total-container">Total de gastos: 0 €</div>
 
-    <div>
-      <h2>Nuevo Gasto</h2>
-      <div id="form-container"></div>
-    </div>
+    <h2>Nuevo gasto</h2>
+    <div id="form-container"></div>
 
-    <div>
-      <h2>Listado de Gastos</h2>
-      <div id="gastos-container"></div>
-    </div>
+    <h2>Listado de gastos</h2>
+    <div id="gastos-container"></div>
 
-    <script src="js/gestionPresupuesto.js"></script>
-    <script src="js/gestionPresupuestoWebV1.js"></script>
+    <template id="template-gasto">
+      <div class="gasto-item">
+        <div class="descripcion"></div>
+        <div class="valor"></div>
+        <div class="fecha"></div>
+        <div class="etiquetas"></div>
+
+        <div class="gasto-acciones">
+          <button class="btn-editar">Editar</button>
+          <button class="btn-borrar">Borrar</button>
+        </div>
+
+        <form class="form-edicion" style="display: none">
+          <input type="text" class="edit-descripcion" required />
+          <input type="number" class="edit-valor" required />
+          <input type="date" class="edit-fecha" required />
+          <input type="text" class="edit-etiquetas" />
+
+          <button type="submit">Guardar</button>
+          <button type="button" class="btn-cancelar">Cancelar</button>
+        </form>
+      </div>
+    </template>
+
+    <script type="module" src="js/gestionPresupuestoWebV2.js"></script>
   </body>
 </html>
