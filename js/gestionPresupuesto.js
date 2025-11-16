@@ -28,22 +28,18 @@ function CrearGasto(descripcion, valor, fecha = new Date(), ...etiquetas) {
       : new Date().getTime();
   this.timestamp = this.fecha;
 
-  // PROCESAR ETIQUETAS CORRECTAMENTE
   this.etiquetas = [];
 
   if (etiquetas.length > 0 && Array.isArray(etiquetas[0])) {
-    // Caso: etiquetas pasadas como array
     this.etiquetas = etiquetas[0].filter(
       (et) => typeof et === "string" && et.trim() !== ""
     );
   } else {
-    // Caso: etiquetas pasadas como parámetros individuales
     this.etiquetas = etiquetas.filter(
       (et) => typeof et === "string" && et.trim() !== ""
     );
   }
 
-  // ELIMINAR DUPLICADOS
   this.etiquetas = [...new Set(this.etiquetas)];
 }
 
@@ -98,7 +94,6 @@ CrearGasto.prototype.anyadirEtiquetas = function (...nuevasEtiquetas) {
       this.etiquetas.push(et);
     }
   });
-  // Eliminar duplicados por si acaso
   this.etiquetas = [...new Set(this.etiquetas)];
 };
 
